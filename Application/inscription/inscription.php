@@ -10,19 +10,47 @@ if(isset($_POST['valider'])) {
             $email=htmlspecialchars($_POST['Email']);
             $password=htmlspecialchars($_POST['Password']);
 
-            $conn=mysqli_connect('localhost', 'root', '', 'rec_website') or die(mysqli_error());
+            $servername = "localhost";
+            $DB="rec_website";
+            $username = "root";
+            $password = "";
+
+            $dsn = "mysql:host=$servername;dbname=$DB";
+
+            try {
+                  $conn = new PDO($dsn, $username, $password);
+                  // set the PDO error mode to exception
+                  $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+                } catch(PDOException $e) {
+                  echo "Connection failed: " . $e->getMessage();
+
+                }
 
             if($type=="candidat"){
 
-                $req="insert into candidats (prenom, nom, email, password) values ('$prenom', '$nom', '$email','$password') ";
-                $res=mysqli_query($conn, $req);
+                
+                $sql = "insert into candidats (prenom, nom, email, password) values (:prenom, :nom, :email,:password) ";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':prenom', $prenom);
+                $stmt->bindParam(':nom', $nom);
+                $stmt->bindParam(':email', $email);
+                $stmt->bindParam(':password', $password);
+                $stmt->execute();
+
                 echo "le candidat <mark><b>$prenom $nom</b></mark>, a été ajoutée avec succés !";
 
             }
             else{
 
-                $req="insert into recruteurs (prenom, nom, email, password) values ('$prenom', '$nom', '$email','$password') ";
-                $res=mysqli_query($conn, $req);
+                $sql = "insert into recruteurs (prenom, nom, email, password) values (:prenom, :nom, :email,:password) ";
+                $stmt = $conn->prepare($sql);
+                $stmt->bindParam(':prenom', $prenom);
+                $stmt->bindParam(':nom', $nom);
+                $stmt->bindParam(':email', $email);
+                $stmt->bindParam(':password', $password);
+                $stmt->execute();
+
                 echo "le recruteur <mark><b>$prenom $nom</b></mark>, a été ajoutée avec succés !";
             }
 
